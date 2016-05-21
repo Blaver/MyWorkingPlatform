@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Project Title</title>
+		<link type="text/css" rel="stylesheet" href="lib/tipsy/tipsy.css"/>
+		<link type="text/css" rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css"/>
+		<link type="text/css" rel="stylesheet" href="lib/contextmenu/jquery.contextmenu.css"/>
+		<link type="text/css" rel="stylesheet" href="css/style.css"/>
+		<link rel="stylesheet" href="css/reset.css"> <!-- CSS reset -->
+		
+		<script type="text/javascript" src="lib/three.js"></script>
+		<script type="text/javascript" src="lib/d3/d3.min.js"></script>
+		<script type="text/javascript" src="lib/jquery/jquery-1.10.1.min.js"></script>
+		<script type="text/javascript" src="lib/tipsy/jquery.tipsy.js"></script>
+		<script type="text/javascript" src="lib/jquery-ui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="lib/colorbrewer/colorbrewer.js"></script>
+		<script type="text/javascript" src="lib/contextmenu/jquery.contextmenu.js"></script>
+	</head>
+	<body>
+		<div style="width: 1280px; height: 900px; margin: 0 auto;">
+			<div style="width: 312px; float: left;">
+				<div id="tabmain" style="width: 300px; margin: 4px">
+					<ul>
+						<li><a href="#sview1" class="toolbar_label">OverView</a></li>
+						<li><a href="#sview2" class="toolbar_label">Query</a></li>
+  					</ul>
+					<div id="sview1" class="ui-widget-content ui-corner-all"></div>
+					<div id="sview2" class="ui-widget-content ui-corner-all"></div>
+				</div>
+				<div id="tablists" style="width: 300px; height:535px; margin: 4px">
+					<ul>
+						<li><a href="#vview1" class="toolbar_label">Vertical View1</a></li>
+   						<li><a href="#vview2" class="toolbar_label">Vertical View2</a></li>
+  					</ul>
+					<div id="vview1" class="ui-widget-content ui-corner-all">
+						<div class="jquery-accordion-menu-header" id="form"></div>
+						<div id="accordion" class="accordion-menu">
+						</div>
+					</div>
+					<div id="vview2" class="ui-widget-content ui-corner-all no_selection"></div>
+				</div>
+			</div>
+			
+			<div style="width: 750px; float: left;">
+				<div style="width: 750px; margin: 4px">
+					<div class="toolbar ui-widget-header ui-corner-all">
+						<span class="ui-widget" style="float: left;">
+								MainView
+								<select id="dataset" display="none" onchange="displaydata()" >
+								</select>
+						</span>
+					</div>
+					 <form>
+  						<div id="radio">
+    						<input type="radio" id="radio1" name="radio" checked="checked"><label for="radio1">View 1</label>
+    						<input type="radio" id="radio2" name="radio"><label for="radio2">View 2</label>
+    						<input type="radio" id="radio3" name="radio"><label for="radio3">View 3</label>
+  						</div>
+					</form>
+					<div id="mainview" style="margin-top:-4px; width: 750px" class="ui-widget-content ui-corner-all no_selection"></div>
+					<div id="mainview2" style="margin-top:-4px; width: 750px" class="ui-widget-content ui-corner-all no_selection"></div>
+					<div id="mainview3" style="margin-top:-4px; width: 750px" class="ui-widget-content ui-corner-all no_selection"></div>
+				</div>
+				<div id="tabs" style="width: 960px; margin: 4px">
+					<ul>
+   						<li>
+   							<a href="#hview1" class="toolbar_label">Horizontal View 1</a>
+   						</li>
+   						<li>
+   							<a href="#hview2" class="toolbar_label">Horizontal View 2</a>
+   						</li>
+  					</ul>
+  					<div id="hview1" style="margin-top:4px; width: 953px" class="ui-widget-content ui-corner-all no_selection"></div>
+					<div id="hview2" style="margin-top:4px; width: 953px" class="ui-widget-content ui-corner-all no_selection"></div>
+				</div>
+			</div>
+			
+			<div style="width: 190px; height: 200px;float: left;">
+				<div style="width: 190px; height: 210px;margin-left:20px;margin-top: 4px">
+					<div class="toolbar ui-widget-header ui-corner-all">
+						<span class="ui-widget" style="float: left;">Statistics</span>
+					</div>
+					<div id="sideview" class="ui-widget-content ui-corner-all no_selection"></div>
+				</div>
+			</div>
+			
+		</div>
+		<script type="text/javascript" src="js/vis.js"></script>
+		<script type="text/javascript" src="js/component.js"></script>
+		<script type="text/javascript" src="js/horizonal.js"></script>
+		<script type="text/javascript" src="js/mds.js"></script>
+		<script type="text/javascript" src="js/rawdata.js"></script>
+		<script type="text/javascript" src="js/scatterplot.js"></script>
+		<script type="text/javascript" src="js/heatmap.js"></script>
+		<script type="text/javascript" src="js/targetvue.js"></script>
+		<script type="text/javascript" src="js/single.js"></script>
+		<script type="text/javascript" src="js/driver.js"></script>
+
+
+<script type="text/javascript">
+(function($) {
+$.expr[":"].Contains = function(a, i, m) {
+	return (a.textContent || a.innerText || "").toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
+};
+function filterList(header, list) {
+	//@header 头部元素
+	//@list 无需列表
+	//创建一个搜素表单
+	var form = $("<form>").attr({
+		"class":"filterform",
+		action:"#"
+	}), input = $("<input>").attr({
+		"class":"filterinput",
+		type:"text"
+	});
+	$(form).append(input).appendTo(header);
+	$(input).change(function() {
+		var filter = $(this).val();
+		if (filter) {
+			//$matches = $(list).find("label:Contains(" + filter + ")").parent();
+			$matches = $(list).find("h3:Contains(" + filter + ")");
+			$submatches=$(list).find("label:Contains(Lab Results)");
+			$("h3", list).not($matches).slideUp();
+			$matches.slideDown();
+			$submatches.slideDown();
+		} else {
+			$(list).find("h3").slideDown();
+		}
+		return false;
+	}).keyup(function() {
+		$(this).change();
+	});
+}
+$(function() {
+	filterList($("#form"), $("#accordion"));
+});
+})(jQuery);	
+
+	$(function() {
+	$( "#radio" ).buttonset();
+	});
+</script>
+		<br>
+		<br>
+		<footer class="central">&copy; 2015, nancao.org</footer>
+	</body>
+</html>
